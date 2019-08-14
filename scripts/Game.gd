@@ -65,8 +65,8 @@ func settle_square(position: Dictionary, player_sign: String):
 	button_label.visible = true
 
 func find_center(position: Dictionary) -> Dictionary:
-	var row = floor(position["row"])
-	var column = floor(position["column"])
+	var row = floor(position["row"] / 3)
+	var column = floor(position["column"] / 3)
 
 	row *= 3
 	row += 1
@@ -81,49 +81,58 @@ func find_delta(a: Dictionary, b: Dictionary) -> Dictionary:
 	var column = a["column"] - b["column"]
 	return {"row": row, "column": column}
 
-func apply_move(position: Dictionary, player_sign: String) -> void:
-	settle_square(position, player_sign)
+func enable_all_squares():
+	for row in range(9):
+		for column in range(9):
+			var node_name = build_node_name({"row": row, "column": column})
+			var node = get_node(LOCAL_BOARD + "/" + node_name)
+			if node.visible:
+				node.disabled = false
+			pass
+		pass
+	pass
 
-	var center_position: Dictionary = find_center(position)
+func disable_all_squares():
+	for row in range(9):
+		for column in range(9):
+			var node_name = build_node_name({"row": row, "column": column})
+			var node = get_node(LOCAL_BOARD + "/" + node_name)
+			if node.visible:
+				node.disabled = true
+			pass
+		pass
+	pass
 
+func calculate_new_global_position(position, center_position) -> Dictionary:
 	var new_position: Dictionary = find_delta(position, center_position)
 	new_position["row"] += 1
 	new_position["column"] += 1
+	return new_position
 
-	if are_local_boards_won(new_position, player_sign):
-		allow_all_squares = true
-	else:
-		allow_all_squares = false
+func apply_move(position: Dictionary, player_sign: String) -> void:
+	settle_square(position, player_sign)
+	var center_position: Dictionary = find_center(position)
+	var new_position: Dictionary = calculate_new_global_position(position, center_position)
+	allow_all_squares = is_local_board_won(new_position, player_sign)
 
 	# TODO: if allow all squares, open all squares
 	if allow_all_squares:
-		for row in range(81):
-			for column in range(81):
-				var node_name = build_node_name({"row": row, "column": column})
-				var node = get_node(LOCAL_BOARD + "/" + node_name)
-				if node.visible:
-					node.disabled = false
-				pass
-			pass
-		pass
+		enable_all_squares()
 	else:
-		for row in range(81):
-			for column in range(81):
+		disable_all_squares()
+		for i in range(3):
+			for j in range(3):
+				var row = new_position["row"] * 3 + i
+				var column = new_position["column"] * 3 + j
 				var node_name = build_node_name({"row": row, "column": column})
 				var node = get_node(LOCAL_BOARD + "/" + node_name)
 				if node.visible:
 					node.disabled = false
 				pass
 			pass
-		for row in range(-1, 1+1):
-			for column in range(-1, 1+1):
-				var node_name = build_node_name({"row": row, "column": column})
-				var node = get_node(LOCAL_BOARD + "/" + node_name)
-				if node.visible:
-					node.disabled = false
 		pass
 
-func fill_local_boards(global_position: Dictionary, player_sign: String):
+func fill_local_board(global_position: Dictionary, player_sign: String):
 	var row = int(global_position["row"]) * 3
 	var column = int(global_position["column"]) * 3
 
@@ -135,7 +144,7 @@ func fill_local_boards(global_position: Dictionary, player_sign: String):
 
 	pass
 
-func win_local_boards(global_position: Dictionary, player_sign: String):
+func win_local_board(global_position: Dictionary, player_sign: String):
 	var button_node: TextureButton = get_node(GLOBAL_BOARD + "/" + build_node_name(global_position))
 	button_node.disabled = true
 	button_node.visible = true
@@ -158,8 +167,8 @@ func handle_events(events: Array):
 				var position: Dictionary = eventDTO["position"]
 				apply_move(position, eventDTO["playerSign"])
 			"WIN_LOCAL_BOARD":
-				fill_local_boards(eventDTO["globalPosition"], eventDTO["playerSign"])
-				win_local_boards(eventDTO["globalPosition"], eventDTO["playerSign"])
+				fill_local_board(eventDTO["globalPosition"], eventDTO["playerSign"])
+				win_local_board(eventDTO["globalPosition"], eventDTO["playerSign"])
 			"GAME_ENDS":
 				$WinnerLabel.text = Session.data["room"][eventDTO["winner"]["playerSign"]]["name"] + " (" + eventDTO["winner"]["playerSign"] + ")" + " wins!"
 				is_game_finished = true
@@ -167,8 +176,9 @@ func handle_events(events: Array):
 				$GoBackButton.visible = true
 	pass
 
-func are_local_boards_won(position: Dictionary, player_sign: String) -> bool:
-	return (get_node(GLOBAL_BOARD + "/" + build_node_name(position) + "/" + player_sign)).visible == true
+func is_local_board_won(position: Dictionary, player_sign: String) -> bool:
+	var node_name = GLOBAL_BOARD + "/" + build_node_name(position)
+	return get_node(node_name).visible == true
 
 
 func _on_GoBackButton_pressed():
