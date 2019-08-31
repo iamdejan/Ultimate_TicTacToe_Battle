@@ -4,6 +4,7 @@ var is_game_finished: bool = false
 
 const LOCAL_BOARD = "LocalBoard"
 const GLOBAL_BOARD = "GlobalBoard"
+const SIZE = 9
 
 var allow_all_squares: bool
 
@@ -81,27 +82,22 @@ func find_delta(a: Dictionary, b: Dictionary) -> Dictionary:
 	var column = a["column"] - b["column"]
 	return {"row": row, "column": column}
 
-func enable_all_squares():
-	for row in range(9):
-		for column in range(9):
+func traverse_all_squares(disabled_status: bool):
+	for row in range(SIZE):
+		for column in range(SIZE):
 			var node_name = build_node_name({"row": row, "column": column})
 			var node = get_node(LOCAL_BOARD + "/" + node_name)
 			if node.visible:
-				node.disabled = false
+				node.disabled = disabled_status
 			pass
 		pass
 	pass
 
+func enable_all_squares():
+	traverse_all_squares(false)
+
 func disable_all_squares():
-	for row in range(9):
-		for column in range(9):
-			var node_name = build_node_name({"row": row, "column": column})
-			var node = get_node(LOCAL_BOARD + "/" + node_name)
-			if node.visible:
-				node.disabled = true
-			pass
-		pass
-	pass
+	traverse_all_squares(true)
 
 func calculate_new_global_position(position, center_position) -> Dictionary:
 	var new_position: Dictionary = find_delta(position, center_position)
