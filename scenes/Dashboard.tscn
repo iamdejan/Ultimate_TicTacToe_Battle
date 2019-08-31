@@ -69,6 +69,7 @@ margin_bottom = 629.38
 [node name="CreateRoomHTTPRequest" type="HTTPRequest" parent="."]
 
 [node name="JoinRoomHTTPRequest" type="HTTPRequest" parent="."]
+[connection signal="pressed" from="JoinRoomButton" to="." method="_on_JoinRoomButton_pressed"]
 [connection signal="pressed" from="CreateRoomButton" to="." method="_on_CreateRoomButton_pressed"]
 [connection signal="request_completed" from="CreateRoomHTTPRequest" to="." method="_on_CreateRoomHTTPRequest_request_completed"]
 [connection signal="request_completed" from="JoinRoomHTTPRequest" to="." method="_on_JoinRoomHTTPRequest_request_completed"]

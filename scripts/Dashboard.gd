@@ -42,3 +42,11 @@ func _on_JoinRoomHTTPRequest_request_completed(result, response_code, headers, b
 	if response_code == 200:
 		get_tree().change_scene(Session.build_scene_URL("WaitingRoom"))
 	pass
+
+
+func _on_JoinRoomButton_pressed():
+	set_room_data({
+		"id": $RoomIDText.text
+	})
+	self_join()
+	pass
