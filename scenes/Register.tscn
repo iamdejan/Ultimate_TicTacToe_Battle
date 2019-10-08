@@ -34,21 +34,30 @@ Tic-Tac-Toe
 Battle"
 align = 1
 
-[node name="UserIDText" type="TextEdit" parent="."]
+[node name="UserIDText" type="LineEdit" parent="."]
 margin_left = 115.0
-margin_top = 536.26
+margin_top = 419.16
 margin_right = 602.0
-margin_bottom = 616.26
+margin_bottom = 499.16
 custom_fonts/font = SubResource( 2 )
 text = "User ID (number)"
 
-[node name="NameText" type="TextEdit" parent="."]
+[node name="NameText" type="LineEdit" parent="."]
 margin_left = 115.0
-margin_top = 687.0
+margin_top = 549.407
 margin_right = 602.0
-margin_bottom = 763.0
+margin_bottom = 625.407
 custom_fonts/font = SubResource( 2 )
 text = "Name"
+
+[node name="PasswordText" type="LineEdit" parent="."]
+margin_left = 115.0
+margin_top = 665.406
+margin_right = 602.0
+margin_bottom = 741.406
+custom_fonts/font = SubResource( 2 )
+text = "Password"
+secret = true
 
 [node name="GoBackButton" parent="." instance=ExtResource( 4 )]
 margin_left = 247.375
